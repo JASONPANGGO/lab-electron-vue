@@ -1,0 +1,170 @@
+html,
+body {
+  margin: 0;
+  color: $text;
+  letter-spacing: 0.5px;
+  // font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+  font-family: -apple-system,SF UI Text,Arial,PingFang SC,Hiragino Sans GB,Microsoft YaHei,WenQuanYi Micro Hei,sans-serif;
+  font-size: $font-size-base;
+  font-weight: 400;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  padding: 5rem 0 0 0;
+}
+
+@font-face {
+  font-family: 'Futura';
+  src: url('https://static.jkchao.cn/Futura.ttc');
+}
+
+
+*, *:hover {
+  @include transition(background-color .25s linear,
+                      color .10s linear,
+                      margin .25s linear,
+                      opacity .25s linear,
+                      filter .25s linear,
+                      visibility .25s linear,
+                      transform .25s linear,
+                      border-color .25s linear);
+}
+
+.container {
+  width: $container-width;
+  margin: 0 auto;
+}
+
+.font-futura {
+  font-family: Futura;
+}
+
+
+// 清除浮动
+.clearfix {
+  &:after {
+    content: '';
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+  }
+}
+
+#share {
+  
+    &.article-share {
+  
+      > .share-box {
+        opacity: .6;
+  
+        &:hover {
+          opacity: 1;
+        }
+  
+        > .share-link {
+          width: calc((100% - (.445em * 11)) / 12);
+          height: 2.2em;
+          line-height: 2.3em;
+          background-color: #eee;
+          margin-right: .13rem;
+  
+          > .iconfont {
+            font-size: 1.3em;
+          }
+  
+          &:last-child {
+            margin-right: 0;
+          }
+        }
+      }
+    }
+  
+    &.sidebar-share {
+      position: fixed;
+      top: 25%;
+      left: 0;
+      width: 4em;
+  
+      > .share-box {
+        opacity: .4;
+  
+        &:hover {
+          opacity: 1;
+        }
+  
+        > .share-link {
+          width: 3em;
+          height: 2.5em;
+          line-height: 2.6em;
+  
+          > .iconfont {
+            font-size: 1.3em;
+          }
+  
+          &.renren,
+          &.evernote,
+          &.google-plus,
+          &.linkedin,
+          &.mail {
+            display: none;
+          }
+  
+          &:last-child {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+::-webkit-input-placeholder {
+  /* WebKit browsers */
+  color: $disabled;
+  font-size: 1rem;
+}
+
+:-moz-placeholder {
+  /* Mozilla Firefox 4 to 18 */
+  color: $disabled;
+  font-size: 1rem;
+}
+
+::-moz-placeholder {
+  /* Mozilla Firefox 19+ */
+  color: $disabled;
+  font-size: 1rem;
+}
+
+:-ms-input-placeholder {
+  /* Internet Explorer 10+ */
+  color: $disabled;
+  font-size: 1rem;
+}
+
+
+::-webkit-scrollbar {
+  width: .5rem;
+  height: .5rem;
+  background: hsla(0, 0%, 100%, 0.6);
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 0;
+  background-color: rgba(95,95,95,.4);
+  transition: all .2s;
+  border-radius: .5rem;
+
+  &:hover {
+    background-color: rgba(95,95,95, .7);
+  }
+}
