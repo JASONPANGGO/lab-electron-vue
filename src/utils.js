@@ -6,10 +6,26 @@ import { execSync } from 'child_process'
 import crypto from 'crypto'
 import { getPatchList, getVersion } from './renderer/service'
 // import unzipper from 'unzipper'
-const unzipper = require('unzipper')
+import JSzip from 'jszip'
+const MAX_DELTA = 5000
+
+/**
+ * 
+ * @param {Date} a 
+ * @param {Date} b 
+ */
+function compareTimeStamp (a, b) {
+  const delta = Math.abs(a.getTime() - b.getTime())
+  return delta < MAX_DELTA
+}
+
 export const CONFIG_PATH = path.join(process.cwd(), 'CONFIG')
 export const EXE_PATH = path.join(process.cwd(), 'InphaseNXD.EXE')
 export const PATCHLIST_PATH = path.join(process.cwd(), 'PatchList')
+export const VERSION = {
+  patch: null,
+  exe: null
+}
 
 export const request = axios.create({
   headers: {
@@ -40,25 +56,29 @@ export const md5 = string => {
   return crypto.createHash('md5').update(string).digest('hex')
 }
 
-export async function unzip (zipPath) {
-  async function save (file) {
-    if (file.type === 'Directory') {
-      try {
-        fs.statSync(file.path)
-      } catch (error) {
-        fs.mkdirSync(file.path)
-      }
-      return
+/**
+ *
+ * @param {string} zipPath
+ * @param {string} savePath
+ */
+export async function unzip (zipPath, savePath) {
+  const zip = new JSzip()
+  await zip.loadAsync(fs.readFileSync(zipPath))
+  return Promise.all(Object.values(zip.files).map(file => {
+    const dest = path.join(process.cwd(), savePath, file.name)
+    if (file.dir) {
+      return fs.mkdirSync(dest, { recursive: true })
+    } else {
+      return file.async('nodebuffer').then(data => {
+        fs.writeFileSync(dest, data)
+      })
     }
-    const buffer = await file.buffer()
-    fs.writeFileSync(file.path, buffer)
-  }
-  const dir = await unzipper.Open.buffer(fs.readFileSync(zipPath))
-  await Promise.all(dir.files.map(file => save(file)))
-}
+  }))
+};
 
 export function checkPatch () {
   return new Promise(async (resolve, reject) => {
+    console.log('checking patch...');
     const { latestTime, downloadUrl } = await getPatchList()
     const latestHash = md5(latestTime)
     let currentHash
@@ -82,8 +102,9 @@ export function checkPatch () {
 
 export function checkEXE () {
   return new Promise(async (resolve, reject) => {
+    console.log('checking exe...');
     const { latestTime, downloadUrl } = await getVersion()
-    const latestTimeString = new Date(latestTime).toString()
+    const latestTimeDate = new Date(latestTime)
     let currentStat
     try {
       currentStat = statSync(EXE_PATH)
@@ -92,16 +113,16 @@ export function checkEXE () {
       reject({ latestTime: new Date(latestTime), downloadUrl })
       return
     }
-    const currentTimeString = currentStat.mtime.toString()
+    const currentTimeDate = currentStat.mtime
 
-    console.log('exe latest:', latestTimeString)
-    console.log('exe current:', currentTimeString)
+    console.log('exe latest:', latestTimeDate)
+    console.log('exe current:', currentTimeDate)
 
-    if (currentTimeString === latestTimeString) {
+    if (compareTimeStamp(currentTimeDate, latestTimeDate)) {
       resolve()
     } else {
       // eslint-disable-next-line prefer-promise-reject-errors
-      reject({ latestTime: new Date(latestTime), downloadUrl })
+      reject({ latestTime: latestTimeDate, downloadUrl })
     }
   })
 }
